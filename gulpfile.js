@@ -21,6 +21,7 @@ const path = {
 
 gulp.task('index', () => {
   gulp.src(path.indexSrc)
+  .pipe(plumber())
   .pipe(gulp.dest('build'))
   .pipe(browserSync.stream())
 })
@@ -38,7 +39,8 @@ gulp.task('css', () =>
 )
 
 gulp.task('js', () => {
-  return gulp.src(path.jsSrc)
+  gulp.src(path.jsSrc)
+    .pipe(plumber())
     .pipe(webpackStream({
       output: {
         filename: 'app.js',
@@ -82,7 +84,7 @@ gulp.task('browser-sync', () =>
   })
 )
 
-gulp.task('default', ['clean', 'index', 'css', 'js', 'browser-sync'], () => {
+gulp.task('default', ['index', 'css', 'js', 'browser-sync'], () => {
   gulp.watch(path.indexSrc, ['index'])
   gulp.watch(path.sassSrc, ['css'])
   gulp.watch(path.jsSrc, ['js'])
