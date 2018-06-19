@@ -114,13 +114,17 @@ const check = (scene) => {
 }
 
 
-const createCamera = (scene, radius) => {
+const createCamera = (scene, position) => {
     let v0 = BABYLON.Vector3.Zero()
-    // let camera = new BABYLON.FreeCamera("camera1", v0, scene);
+    let pos = new BABYLON.Vector3(0, 0, -30)
+    let radius = 30
+    // let camera = new BABYLON.FreeCamera("camera1", position, scene);
+    // camera.setTarget(v0)
 
-    var camera = new BABYLON.ArcRotateCamera("Camera", Math.PI * 1.25, Math.PI/2, radius, v0, scene)
+    var camera = new BABYLON.ArcRotateCamera("Camera",  -Math.PI/2, Math.PI/2, radius, v0, scene)
+    // var camera = new BABYLON.ArcRotateCamera("Camera", Math.PI * 1.25, Math.PI/2, radius, v0, scene)
 
-    camera.lowerRadiusLimit = 2;
+    camera.lowerRadiusLimit = 10;
     camera.upperRadiusLimit = 40;
     camera.wheelDeltaPercentage = 0.05;
 
@@ -132,68 +136,116 @@ const createCamera = (scene, radius) => {
 const addLight = (scene, position) => {
     var light = new BABYLON.PointLight("light1", position, scene);
     light.intensity = 1;
+    light.range = 280
 
-    var shadowGenerator = new BABYLON.ShadowGenerator(1024, light);
-    shadowGenerator.useBlurExponentialShadowMap = true;
-    shadowGenerator.blurKernel = 32;
     return light
 }
 
 
 
-const addShadow = (light, blur = true) => {
-    var shadowGenerator = new BABYLON.ShadowGenerator(1024, light);
-    shadowGenerator.useBlurExponentialShadowMap = blur;
-    shadowGenerator.blurKernel = 32;
-    return light
+const addShadows = (light, blur = true) => {
+    var shadowGenerator = new BABYLON.ShadowGenerator(2048, light)
+    shadowGenerator.usePoissonSampling = true;
+    shadowGenerator.useExponentialShadowMap = true;
+
+    shadowGenerator.blurKernel = 32
+
+    shadowGenerator.setDarkness(0.2);
+    return shadowGenerator
+}
+
+
+const createBox = (scene, position) => {
+    
+    var box = BABYLON.MeshBuilder.CreateBox('sphere1', {width: 1, height: 1, depth: 1}, scene);
+    box.position = position
+    box.receiveShadows = true
+    return box
 }
 
 
 const createSphere = (scene, position) => {
     let segments = 16,
         diametr = 2
-    var sphere = BABYLON.Mesh.CreateSphere("sphere1", segments, diametr, scene);
+    var sphere = BABYLON.Mesh.CreateSphere('sphere1', segments, diametr, scene);
     sphere.position = position
 }
 
 
-const ImportMesh = (scene) => {
-    let scenePath = './assets/3d/3d.babylon'
+const ImportMesh = (scene, fileName, onSuccess, onError, onProgress) => {
+    let assetsManager = new BABYLON.AssetsManager(scene);
 
-    // Assets manager
-    var assetsManager = new BABYLON.AssetsManager(scene);
+    let meshTask = assetsManager.addMeshTask(fileName, '', './assets/3d/', fileName)
+    
+    meshTask.onSuccess = onSuccess
+    assetsManager.onTaskError = onError
+    assetsManager.useDefaultLoadingScreen = false;
 
-    var meshTask = assetsManager.addMeshTask("skull task", "", "./assets/3d/", "3d.babylon");
-
-    // You can handle success and error on a per-task basis (onSuccess, onError)
-    meshTask.onSuccess = function (task) {
-        task.loadedMeshes[0].position = new BABYLON.Vector3(0, 0, 0);
-    }
-
-    // But you can also do it on the assets manager itself (onTaskSuccess, onTaskError)
-    assetsManager.onTaskError = function (task) {
-        console.log("error while loading " + task.name);
-    }
-
-    var binaryTask = assetsManager.addBinaryFileTask("binary task", "./assets/textures/pan.png");
-    binaryTask.onSuccess = function (task) {
-        // Do something with task.data
-    }
-
-    assetsManager.onFinish = function (tasks) {
-        engine.runRenderLoop(function () {
-            scene.render();
-        });
-    };
 
     assetsManager.load();
+    return meshTask
+}
+
+
+const particleSistem = (scene, emitter) => {
+    var particleSystem = new BABYLON.ParticleSystem("particles", 100, scene);
+
+    //Texture of each particle
+    particleSystem.particleTexture = new BABYLON.Texture("assets/textures/flare.png", scene);
+
+    // Where the particles come from
+    // particleSystem.emitter = emitter.position
+    particleSystem.emitter = new BABYLON.Vector3(0, 0, -10)
+    particleSystem.minEmitBox = new BABYLON.Vector3(10, 10, 5); // Starting all from
+    particleSystem.maxEmitBox = new BABYLON.Vector3(-10, -10, -5); // To...
+
+    // Colors of all particles
+    // particleSystem.color1 = new BABYLON.Color4(0.7, 0.8, 1.0, 1.0);
+    // particleSystem.color2 = new BABYLON.Color4(0.2, 0.5, 1.0, 1.0);
+    particleSystem.colorDead = new BABYLON.Color4(0.1, 0, 0, 0.0);
+
+    // Size of each particle (random between...
+    particleSystem.minSize = 0.06;
+    particleSystem.maxSize = 0.2;
+
+    // Life time of each particle (random between...
+    particleSystem.minLifeTime = 0.1;
+    particleSystem.maxLifeTime = 0.3;
+
+    // Emission rate
+    particleSystem.emitRate = 150;
+
+    // Blend mode : BLENDMODE_ONEONE, or BLENDMODE_STANDARD
+    particleSystem.blendMode = BABYLON.ParticleSystem.BLENDMODE_ONEONE;
+
+    // Set the gravity of all particles
+    particleSystem.gravity = new BABYLON.Vector3(0, 0.1, 0);
+
+    // Direction of each particle after it has been emitted
+    particleSystem.direction1 = new BABYLON.Vector3(0, 0, 0);
+
+    // Angular speed, in radians
+    particleSystem.minAngularSpeed = 0;
+    particleSystem.maxAngularSpeed = Math.PI*2;
+
+    // Speed
+    particleSystem.minEmitPower = 0;
+    particleSystem.maxEmitPower = 0;
+    particleSystem.updateSpeed = 0.002;
+
+    // Start the particle system
+    particleSystem.start();
+
+    return particleSystem
 }
 
 
 export {
     createCamera,
     addLight,
-    addShadow,
+    addShadows,
     createSphere,
-    ImportMesh
+    createBox,
+    ImportMesh,
+    particleSistem
 }
