@@ -1,5 +1,18 @@
 import $ from 'jquery'
-import {createCamera, addLight, addGodRay, addShadows, createSphere, createBox, ImportMesh, particleSistem, addFog, createShaderMaterial} from './mod'
+import {
+  createCamera, 
+  addLight, 
+  addGodRay, 
+  addShadows, 
+  createSphere, 
+  createBox, 
+  createRibbon,
+  ImportMesh, 
+  particleSistem, 
+  solidParticleSistem, 
+  addFog, 
+  createShaderMaterial
+} from './mod'
 import{initEngine} from './initEngine'
  
 
@@ -19,21 +32,22 @@ $(document).ready(()=>{
   let rayPos = new BABYLON.Vector3(0, 10, 20)
   let lightScale = new BABYLON.Vector3(50, 80, 50)
   let light = addLight(scene, lightPos)
+
   
   // addGodRay(scene, rayPos, lightScale, mainCamera, engine)
-  // let shadows = addShadows(light)
+  let shadows = addShadows(light)
 
   let spherePos = lightPos
   let sphere0 = createSphere(scene, spherePos)
 
+  let material = createShaderMaterial(scene, mainCamera)
 
-  let boxPos = new BABYLON.Vector3(0, 5, -10)
-
-  let material = createShaderMaterial()
-
-
-
+  let boxPos = new BABYLON.Vector3(0, 1, -10)
   // let bx = createBox(scene, boxPos)
+  // bx.material = material;
+
+
+
 
   // var amigaMaterial = new BABYLON.ShaderMaterial("amiga", scene, {
   //   vertexElement: "vertexShaderCode",
@@ -45,17 +59,8 @@ $(document).ready(()=>{
   // });
   // amigaMaterial.setTexture("textureSampler", new BABYLON.Texture("./assets/textures/pan.png", scene));
 
-  // bx.material = material;
 
   // shadows.getShadowMap().renderList.push(bx)
-
-    // // // Fog
-    // scene.fogMode = BABYLON.Scene.FOGMODE_EXP;
-    // scene.fogDensity = 0.02
-    // scene.fogStart = 1;
-    // scene.fogEnd = 100;
-    // scene.fogColor = new BABYLON.Color3(0, 0, 0.01);
-
 
 
   const onLoadSuccess = (task) => {
@@ -63,10 +68,10 @@ $(document).ready(()=>{
     head.position = BABYLON.Vector3.Zero()
     head.rotation.y -= 0.8
     head.receiveShadows = true
+    let size = {width: 200, height: 400, depth: 150}
 
-    task.loadedMeshes[0].addLODLevel(120, createBox(scene, boxPos));
-    // shadows.getShadowMap().renderList.push(task.loadedMeshes[0])
-    task.loadedMeshes[0].material = material;
+    head.addLODLevel(50, createBox(scene, head.rotation, size))
+    // head.material = material;
 
     // head.material.emissiveColor = BABYLON.Color3.Yellow();
     heads.push(task.loadedMeshes[0])
@@ -77,6 +82,7 @@ $(document).ready(()=>{
     console.log("error while loading " + task.name);
   }
 
+  let sps = solidParticleSistem(scene, material)
 
   var time = 0;
 
@@ -85,9 +91,10 @@ $(document).ready(()=>{
   engine.runRenderLoop(function () {
     if (scene) {
       material.setFloat("time", time);
+      sps.setParticles()
       time += 0.04;
 
-      material.setVector3("cameraPosition", scene.activeCamera.position);
+      material.setVector3("cameraPosition", mainCamera.position);
 
       for (let i = 0; i < heads.length; i++) {
         // heads[i].rotation.y += 0.004

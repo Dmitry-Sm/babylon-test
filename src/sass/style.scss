@@ -60,6 +60,8 @@ body {
   border-radius: 50%;
   width: calc(2vh + 4vw); /* Set a specific slider handle width */
   height: calc(2vh + 4vw);
+  max-width: 90px;
+  max-height: 90px;
   background: #4CAF50; /* Green background */
   cursor: pointer; /* Cursor on hover */
 }

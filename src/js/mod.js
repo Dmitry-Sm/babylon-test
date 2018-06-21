@@ -125,7 +125,7 @@ const createCamera = (scene, position) => {
     // var camera = new BABYLON.ArcRotateCamera("Camera", Math.PI * 1.25, Math.PI/2, radius, v0, scene)
 
     camera.lowerRadiusLimit = 10;
-    camera.upperRadiusLimit = 80;
+    camera.upperRadiusLimit = 260;
     camera.wheelDeltaPercentage = 0.05;
 
     camera.attachControl(document.getElementById("render-canvas"), false)
@@ -135,12 +135,11 @@ const createCamera = (scene, position) => {
 
 const addLight = (scene, position) => {
     var light = new BABYLON.PointLight("light1", position, scene);
-    light.intensity = 2;
-    light.range = 60
+    light.intensity = 1.2;
+    light.range = 120
 
     return light
 }
-
 
 
 const addGodRay = (scene, position, scale, camera, engine) => {
@@ -155,27 +154,45 @@ const addGodRay = (scene, position, scale, camera, engine) => {
 }
 
 
-
-
 const addShadows = (light) => {
     var shadowGenerator = new BABYLON.ShadowGenerator(1024, light);
 	shadowGenerator.useBlurExponentialShadowMap = true;
     shadowGenerator.useKernelBlur = true;
     shadowGenerator.blurKernel = 64;
+    
 
-    // shadowGenerator.blurKernel = 32
-
-    shadowGenerator.setDarkness(0.2);
+    shadowGenerator.setDarkness(0.3);
     return shadowGenerator
 }
 
 
-const createBox = (scene, position) => {
+const createBox = (scene, position, size = {width: 4, height: 1, depth: 1}) => {
+    // box.receiveShadows = true
     
-    var box = BABYLON.MeshBuilder.CreateBox('sphere1', {width: 1, height: 1, depth: 1}, scene);
+    var box = BABYLON.MeshBuilder.CreateBox('sphere1', size, scene);
     box.position = position
-    box.receiveShadows = true
+
     return box
+}
+
+
+const createRibbon = (scene) => {
+	var exponentialPath = function (p) {
+		var path = [];
+		for (var i = -1; i < 1; i++) {
+			path.push(new BABYLON.Vector3(i, 0, p/20));
+		}
+		return path;
+    }
+    
+	var arrayOfPaths = [];
+	for (var p = 0; p < 20; p++) {
+		arrayOfPaths[p] = exponentialPath(p);
+    }
+    
+    var ribbon = BABYLON.Mesh.CreateRibbon("ribbon", arrayOfPaths, false, false, 0, scene, true, BABYLON.Mesh.DOUBLESIDE);
+
+    return ribbon
 }
 
 
@@ -203,55 +220,130 @@ const ImportMesh = (scene, fileName, onSuccess, onError, onProgress) => {
 
 
 const particleSistem = (scene) => {
-    var particleSystem = new BABYLON.ParticleSystem("particles", 100, scene);
+    var particleSystem = new BABYLON.GPUParticleSystem("particles", 25000, scene);
 
     //Texture of each particle
-    particleSystem.particleTexture = new BABYLON.Texture("assets/textures/flare.png", scene);
+    let txtr = new BABYLON.Texture("assets/textures/flare.png", scene);
+    txtr.uScale = 0.1;
+    txtr.vScale = 16;
+    particleSystem.particleTexture = txtr
 
     // Where the particles come from
     // particleSystem.emitter = emitter.position
     particleSystem.emitter = new BABYLON.Vector3(0, 0, -10)
-    particleSystem.minEmitBox = new BABYLON.Vector3(10, 10, 5); // Starting all from
-    particleSystem.maxEmitBox = new BABYLON.Vector3(-10, -10, -5); // To...
+    particleSystem.minEmitBox = new BABYLON.Vector3(30, -20, 10); // Starting all from
+    particleSystem.maxEmitBox = new BABYLON.Vector3(-30, -20, 10); // To...
 
     // Colors of all particles
     // particleSystem.color1 = new BABYLON.Color4(0.7, 0.8, 1.0, 1.0);
     // particleSystem.color2 = new BABYLON.Color4(0.2, 0.5, 1.0, 1.0);
-    particleSystem.colorDead = new BABYLON.Color4(0.1, 0, 0, 0.0);
+    // particleSystem.colorDead = new BABYLON.Color4(0.1, 0, 0, 0.0);
 
     // Size of each particle (random between...
-    particleSystem.minSize = 0.06;
-    particleSystem.maxSize = 0.2;
+    particleSystem.minSize = 0.1;
+    particleSystem.maxSize = 0.4;
 
     // Life time of each particle (random between...
     particleSystem.minLifeTime = 0.1;
-    particleSystem.maxLifeTime = 0.3;
+    particleSystem.maxLifeTime = 2;
 
     // Emission rate
-    particleSystem.emitRate = 150;
+    particleSystem.emitRate = 24500;
 
     // Blend mode : BLENDMODE_ONEONE, or BLENDMODE_STANDARD
     particleSystem.blendMode = BABYLON.ParticleSystem.BLENDMODE_ONEONE;
 
     // Set the gravity of all particles
-    particleSystem.gravity = new BABYLON.Vector3(0, 0.1, 0);
+    particleSystem.gravity = new BABYLON.Vector3(0, 40, 0);
 
     // Direction of each particle after it has been emitted
-    particleSystem.direction1 = new BABYLON.Vector3(0, 0, 0);
+    particleSystem.direction1 = new BABYLON.Vector3(0, 5, 25);
+    particleSystem.direction2 = new BABYLON.Vector3(0, 5, 25);
 
     // Angular speed, in radians
     particleSystem.minAngularSpeed = 0;
-    particleSystem.maxAngularSpeed = Math.PI*2;
+    particleSystem.maxAngularSpeed = 0;
 
     // Speed
-    particleSystem.minEmitPower = 0;
-    particleSystem.maxEmitPower = 0;
-    particleSystem.updateSpeed = 0.002;
+    particleSystem.minEmitPower = 1.8;
+    particleSystem.maxEmitPower = 2;
+    particleSystem.updateSpeed = 0.004;
 
     // Start the particle system
     particleSystem.start();
 
     return particleSystem
+}
+
+
+const solidParticleSistem = (scene, material) => {
+    var sps = new BABYLON.SolidParticleSystem("sps", scene);
+    var model = createRibbon(scene)
+    model.material = material
+    sps.addShape(model, 100);
+    sps.buildMesh();
+    var particles = sps.mesh
+    particles.material = material
+    
+
+    var particleHeight = 4;
+
+    // sps.computeParticleTexture = false
+
+    var areaSize = 2.0;
+    
+    var initParticle = function(particle) {
+        
+        particle.position.x = 40 * areaSize * (Math.random() - 0.5);
+        particle.position.y = -10;
+        particle.position.z = 0;
+            
+        particle.pivot.y = 10;
+        particle.rotation.x = Math.random() * Math.PI * 2;
+        particle.material = material
+
+        // particle.rotation.x = 6.28 * Math.random();
+
+        // particle.rotation.x = 6.28 * Math.random();
+        // particle.rotation.y = 6.28 * Math.random();
+        // particle.rotation.z = 6.28 * Math.random();
+
+        // particle.scale.x = particleWidth;
+        // particle.scale.y = particleWidth;
+        particle.scale.z = particleHeight;
+        // particle.velocity = 10000;
+        
+        // particle.scaling.scaleInPlace(particleSize);
+
+        // if (particle.idx >= half) {
+        //     var p0 = sps.particles[particle.idx - half];
+        //     particle.pivot.x = 1.5 * particleSize;
+        //     particle.pivot.y = particle.pivot.x;
+        //     particle.position.copyFrom(p0.position);
+        //     particle.scaling.scaleInPlace(particleSize * 0.1);
+        //     particle.translateFromPivot = true;
+        // }
+    }
+
+    var updateParticle = function(particle) {
+        // particle.velocity--;
+        particle.rotation.x -= 0.014;
+
+        if (particle.velocity < 0) {
+          particle.alive = false;
+          SPS.recycleParticle(particle);    // call to your own recycle function
+        }
+
+    }
+    model.dispose()
+
+    sps.updateParticle = initParticle;
+    sps.setParticles();
+    // sps.computeParticleColor = false
+
+    sps.updateParticle = updateParticle;
+
+    return sps
 }
 
 
@@ -302,8 +394,8 @@ const addFog = (scene) => {
 }
 
 
+const createShaderMaterial = (scene, camera) => {
 
-const createShaderMaterial = (scene) => {
     BABYLON.Effect.ShadersStore["customVertexShader"]=                "precision highp float;\r\n"+
 
     "// Attributes\r\n"+
@@ -316,56 +408,72 @@ const createShaderMaterial = (scene) => {
     "uniform float time;\r\n"+
 
     "// Varying\r\n"+
-    "varying vec3 vPosition;\r\n"+
+    "varying vec4 vPosition;\r\n"+
     "varying vec3 vNormal;\r\n"+
     "varying vec2 vUV;\r\n"+
 
-    "void main(void) {\r\n"+
+    "void main() {\r\n"+
     "    vec3 v = position;\r\n"+
-    "    v.y += sin(0.1 * position.y + (time)) * 1.2;\r\n"+
-    "    \r\n"+
-    "    gl_Position = worldViewProjection * vec4(v, 1.0);\r\n"+
-    "    \r\n"+
-    "    vPosition = position;\r\n"+
-    "    vNormal = normal;\r\n"+
-    "    vUV = uv;\r\n"+
+    "    vec3 pos = position;\r\n"+
+    "    v.y = sin( atan( position.y, position.z) * 1.) * 100. + 82.;\r\n"+
+    "    v.z = cos( atan( position.y, position.z) * 1.) * 100. + 25.;\r\n"+
+    // "    v.y = sin( pos.z * 1. + time * 2.) * 1.;\r\n"+
+
+    "    vec4 p = vec4( v, 1. );\r\n"+
+
+    "    gl_Position = worldViewProjection * p;\r\n"+
+
+    // "    vPosition = p;\r\n"+
+    // "    vNormal = normal;\r\n"+
+    // "    vUV = uv;\r\n"+
+
     "}\r\n";
 
     BABYLON.Effect.ShadersStore["customFragmentShader"]=                "precision highp float;\r\n"+
 
-    "// Varying\r\n"+
-    "varying vec3 vPosition;\r\n"+
+    "uniform mat4 worldView;\r\n"+
+    "uniform mat4 world;\r\n"+
+    
+    "varying vec4 vPosition;\r\n"+
     "varying vec3 vNormal;\r\n"+
     "varying vec2 vUV;\r\n"+
+    "uniform float time;\r\n"+
 
-    "// Uniforms\r\n"+
-    "uniform mat4 world;\r\n"+
-
-    "// Refs\r\n"+
     "uniform vec3 cameraPosition;\r\n"+
     "uniform sampler2D textureSampler;\r\n"+
+    "uniform sampler2D refSampler;\r\n"+
 
     "void main(void) {\r\n"+
-    "    vec3 vLightPosition = vec3(0,20,-10);\r\n"+
-    "    \r\n"+
-    "    // World values\r\n"+
-    "    vec3 vPositionW = vec3(world * vec4(vPosition, 1.0));\r\n"+
+    "    vec3 vLightPosition = vec3(0,8,-20);\r\n"+
+    
+
+    "    vec3 vPositionW = vec3(0, 10.,-20);\r\n"+
     "    vec3 vNormalW = normalize(vec3(world * vec4(vNormal, 0.0)));\r\n"+
     "    vec3 viewDirectionW = normalize(cameraPosition - vPositionW);\r\n"+
-    "    \r\n"+
+
+    "    vec3 e = normalize( vec3( worldView * vPosition ) );\r\n"+
+    "    vec3 n = normalize( worldView * vec4(vNormal, 0.0) ).xyz;\r\n"+
     "    // Light\r\n"+
-    "    vec3 lightVectorW = normalize(vLightPosition - vPositionW);\r\n"+
+    "    vec3 lightVectorW = normalize(vPositionW);\r\n"+
     "    vec3 color = texture2D(textureSampler, vUV).rgb;\r\n"+
-    "    \r\n"+
-    "    // diffuse\r\n"+
-    "    float ndl = max(0., dot(vNormalW, lightVectorW));\r\n"+
-    "    \r\n"+
+
     "    // Specular\r\n"+
     "    vec3 angleW = normalize(viewDirectionW + lightVectorW);\r\n"+
     "    float specComp = max(0., dot(vNormalW, angleW));\r\n"+
-    "    specComp = pow(specComp, max(1., 512.)) * 2.;\r\n"+
-    "    \r\n"+
-    "    gl_FragColor = vec4(color * ndl + vec3(specComp), 1.);\r\n"+
+    "    specComp = pow(specComp, max(1., 64.)) * 2.;\r\n"+
+
+    "    vec3 r = reflect( e, n );\r\n"+
+    "    float m = 2. * sqrt(\r\n"+
+    "        pow( r.x, 2. ) +\r\n"+
+    "        pow( r.y, 2. ) +\r\n"+
+    "        pow( r.z + 1., 2. )\r\n"+
+    "    );\r\n"+
+    "    vec2 vN = r.xy / m + .5;\r\n"+
+
+    "    vec3 base = texture2D( refSampler, vN).rgb;\r\n"+
+
+    // "    gl_FragColor = vec4( base, 1. );\r\n"+
+    "    gl_FragColor = vec4( base + vec3(specComp), 1. );\r\n"+
     "}\r\n";
 
     // Compile
@@ -378,16 +486,16 @@ const createShaderMaterial = (scene) => {
             uniforms: ["world", "worldView", "worldViewProjection", "view", "projection"]
         });
 
-    var refTexture = new BABYLON.Texture("./assets/textures/sun4.png", scene);
+    var refTexture = new BABYLON.Texture("./assets/textures/pan.png", scene);
     refTexture.wrapU = BABYLON.Texture.CLAMP_ADDRESSMODE;
     refTexture.wrapV = BABYLON.Texture.CLAMP_ADDRESSMODE;
 
-    var mainTexture = new BABYLON.Texture("./assets/textures/sun.png", scene);
+    var mainTexture = new BABYLON.Texture("./assets/textures/amiga.jpg", scene);
 
     shaderMaterial.setTexture("textureSampler", mainTexture);
     shaderMaterial.setTexture("refSampler", refTexture);
-    shaderMaterial.setFloat("time", 0);
-    shaderMaterial.setVector3("cameraPosition", BABYLON.Vector3.Zero());
+    shaderMaterial.setFloat("time", 0.1);
+    shaderMaterial.setVector3("cameraPosition", camera.position);
     shaderMaterial.backFaceCulling = false;
 
     return shaderMaterial
@@ -401,8 +509,10 @@ export {
     addShadows,
     createSphere,
     createBox,
+    createRibbon,
     ImportMesh,
     particleSistem,
+    solidParticleSistem,
     addFog,
     createShaderMaterial
 }
