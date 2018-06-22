@@ -1,4 +1,5 @@
 import $ from 'jquery'
+
 import {
   createCamera, 
   addLight, 
@@ -7,16 +8,26 @@ import {
   createSphere, 
   createBox, 
   createRibbon,
-  ImportMesh, 
+  ImportMesh
+} from './mod'
+
+import {
   particleSistem, 
   solidParticleSistem, 
-  addFog, 
+  addFog
+} from './particleSistems'
+
+import {
   createShaderMaterial
-} from './mod'
+} from './materials'
+
 import{initEngine} from './initEngine'
  
 
+
 $(document).ready(()=>{
+  let V3 = BABYLON.Vector3
+
   BABYLON.Animation.AllowMatricesInterpolation = true;
 
   let [engine, scene] = initEngine()
@@ -25,66 +36,78 @@ $(document).ready(()=>{
   let headWidth = 12
   let range = 0
 
-  let cameraPos = new BABYLON.Vector3(0, 2, -30)
+  let cameraPos = new V3(0, 2, -30)
   let mainCamera = createCamera(scene, cameraPos)
 
-  let lightPos = new BABYLON.Vector3(-5, 6, -20)
-  let rayPos = new BABYLON.Vector3(0, 10, 20)
-  let lightScale = new BABYLON.Vector3(50, 80, 50)
+  let lightPos = new V3(-5, 6, -20)
+  let rayPos = new V3(0, 10, 20)
   let light = addLight(scene, lightPos)
-
   
+  
+  // let lightScale = new V3(50, 80, 50)
   // addGodRay(scene, rayPos, lightScale, mainCamera, engine)
-  let shadows = addShadows(light)
+  // let shadows = addShadows(light)
+  // shadows.getShadowMap().renderList.push(bx)
+  // box.receiveShadows = true
 
   let spherePos = lightPos
   let sphere0 = createSphere(scene, spherePos)
 
-  let material = createShaderMaterial(scene, mainCamera)
 
-  let boxPos = new BABYLON.Vector3(0, 1, -10)
-  // let bx = createBox(scene, boxPos)
+
+  var refTexture = new BABYLON.Texture("./assets/textures/pan.png", scene);
+  refTexture.wrapU = BABYLON.Texture.CLAMP_ADDRESSMODE;
+  refTexture.wrapV = BABYLON.Texture.CLAMP_ADDRESSMODE;
+
+  var mainTexture = new BABYLON.Texture("./assets/textures/pan.png", scene);
+
+  let material = createShaderMaterial(scene, mainCamera, 'basic', mainTexture, refTexture)
+
+  // let boxPos = {x: 0, y: 0, z: -10}
+  // let boxSize = {width: 8, height: 8, depth: 1}
+  // let bx = createBox(scene, boxPos, boxSize)
   // bx.material = material;
 
 
 
 
-  // var amigaMaterial = new BABYLON.ShaderMaterial("amiga", scene, {
-  //   vertexElement: "vertexShaderCode",
-  //   fragmentElement: "fragmentShaderCode",
-  // },
-  // {
-  //     attributes: ["position", "uv"],
-  //     uniforms: ["worldViewProjection"]
-  // });
-  // amigaMaterial.setTexture("textureSampler", new BABYLON.Texture("./assets/textures/pan.png", scene));
-
-
-  // shadows.getShadowMap().renderList.push(bx)
-
-
   const onLoadSuccess = (task) => {
     let head = task.loadedMeshes[0]
-    head.position = BABYLON.Vector3.Zero()
+    head.position = V3.Zero()
     head.rotation.y -= 0.8
     head.receiveShadows = true
     let size = {width: 200, height: 400, depth: 150}
 
-    head.addLODLevel(50, createBox(scene, head.rotation, size))
-    // head.material = material;
+    head.addLODLevel(150, createBox(scene, head.rotation, size))
 
-    // head.material.emissiveColor = BABYLON.Color3.Yellow();
+
     heads.push(task.loadedMeshes[0])
-
   }
+
+
+
+
+
 
   const onLoadError = (task) => {
     console.log("error while loading " + task.name);
   }
 
-  let sps = solidParticleSistem(scene, material)
+
+  refTexture = new BABYLON.Texture("./assets/textures/pan.png", scene);
+  refTexture.wrapU = BABYLON.Texture.CLAMP_ADDRESSMODE;
+  refTexture.wrapV = BABYLON.Texture.CLAMP_ADDRESSMODE;
+
+  mainTexture = new BABYLON.Texture("./assets/textures/pan.png", scene);
+
+  let spsMaterial = createShaderMaterial(scene, mainCamera, 'circleRotate', mainTexture, refTexture, light)
+  let sps = solidParticleSistem(scene, spsMaterial, createRibbon(scene), mainCamera, engine)
 
   var time = 0;
+
+
+
+
 
   /////////
   ////////
@@ -111,12 +134,6 @@ $(document).ready(()=>{
     ImportMesh(scene, '3d.babylon', onLoadSuccess, onLoadError)
   }
 
-  // let ps = particleSistem(scene)
-  // let fog = addFog(scene)
-
-
-
-// r / 50 == r / 100 * 2
 
 
 

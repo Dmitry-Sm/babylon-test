@@ -136,7 +136,7 @@ const createCamera = (scene, position) => {
 const addLight = (scene, position) => {
     var light = new BABYLON.PointLight("light1", position, scene);
     light.intensity = 1.2;
-    light.range = 120
+    light.range = 80
 
     return light
 }
@@ -166,9 +166,7 @@ const addShadows = (light) => {
 }
 
 
-const createBox = (scene, position, size = {width: 4, height: 1, depth: 1}) => {
-    // box.receiveShadows = true
-    
+const createBox = (scene, position, size = {width: 14, height: 1, depth: 1}) => {    
     var box = BABYLON.MeshBuilder.CreateBox('sphere1', size, scene);
     box.position = position
 
@@ -276,14 +274,14 @@ const particleSistem = (scene) => {
 }
 
 
-const solidParticleSistem = (scene, material) => {
+const solidParticleSistem = (scene, material, camera, engine) => {
     var sps = new BABYLON.SolidParticleSystem("sps", scene);
     var model = createRibbon(scene)
-    model.material = material
-    sps.addShape(model, 100);
+    sps.addShape(model, 30);
     sps.buildMesh();
     var particles = sps.mesh
     particles.material = material
+    // new BABYLON.VolumetricLightScatteringPostProcess("vl", 2, camera, particles, 75, BABYLON.Texture.BILINEAR_SAMPLINGMODE, engine, false);
     
 
     var particleHeight = 4;
@@ -302,27 +300,7 @@ const solidParticleSistem = (scene, material) => {
         particle.rotation.x = Math.random() * Math.PI * 2;
         particle.material = material
 
-        // particle.rotation.x = 6.28 * Math.random();
-
-        // particle.rotation.x = 6.28 * Math.random();
-        // particle.rotation.y = 6.28 * Math.random();
-        // particle.rotation.z = 6.28 * Math.random();
-
-        // particle.scale.x = particleWidth;
-        // particle.scale.y = particleWidth;
-        particle.scale.z = particleHeight;
-        // particle.velocity = 10000;
-        
-        // particle.scaling.scaleInPlace(particleSize);
-
-        // if (particle.idx >= half) {
-        //     var p0 = sps.particles[particle.idx - half];
-        //     particle.pivot.x = 1.5 * particleSize;
-        //     particle.pivot.y = particle.pivot.x;
-        //     particle.position.copyFrom(p0.position);
-        //     particle.scaling.scaleInPlace(particleSize * 0.1);
-        //     particle.translateFromPivot = true;
-        // }
+        particle.scale.z = particleHeight; 
     }
 
     var updateParticle = function(particle) {
@@ -333,7 +311,6 @@ const solidParticleSistem = (scene, material) => {
           particle.alive = false;
           SPS.recycleParticle(particle);    // call to your own recycle function
         }
-
     }
     model.dispose()
 
@@ -394,114 +371,6 @@ const addFog = (scene) => {
 }
 
 
-const createShaderMaterial = (scene, camera) => {
-
-    BABYLON.Effect.ShadersStore["customVertexShader"]=                "precision highp float;\r\n"+
-
-    "// Attributes\r\n"+
-    "attribute vec3 position;\r\n"+
-    "attribute vec3 normal;\r\n"+
-    "attribute vec2 uv;\r\n"+
-
-    "// Uniforms\r\n"+
-    "uniform mat4 worldViewProjection;\r\n"+
-    "uniform float time;\r\n"+
-
-    "// Varying\r\n"+
-    "varying vec4 vPosition;\r\n"+
-    "varying vec3 vNormal;\r\n"+
-    "varying vec2 vUV;\r\n"+
-
-    "void main() {\r\n"+
-    "    vec3 v = position;\r\n"+
-    "    vec3 pos = position;\r\n"+
-    "    v.y = sin( atan( position.y, position.z) * 1.) * 100. + 82.;\r\n"+
-    "    v.z = cos( atan( position.y, position.z) * 1.) * 100. + 25.;\r\n"+
-    // "    v.y = sin( pos.z * 1. + time * 2.) * 1.;\r\n"+
-
-    "    vec4 p = vec4( v, 1. );\r\n"+
-
-    "    gl_Position = worldViewProjection * p;\r\n"+
-
-    // "    vPosition = p;\r\n"+
-    // "    vNormal = normal;\r\n"+
-    // "    vUV = uv;\r\n"+
-
-    "}\r\n";
-
-    BABYLON.Effect.ShadersStore["customFragmentShader"]=                "precision highp float;\r\n"+
-
-    "uniform mat4 worldView;\r\n"+
-    "uniform mat4 world;\r\n"+
-    
-    "varying vec4 vPosition;\r\n"+
-    "varying vec3 vNormal;\r\n"+
-    "varying vec2 vUV;\r\n"+
-    "uniform float time;\r\n"+
-
-    "uniform vec3 cameraPosition;\r\n"+
-    "uniform sampler2D textureSampler;\r\n"+
-    "uniform sampler2D refSampler;\r\n"+
-
-    "void main(void) {\r\n"+
-    "    vec3 vLightPosition = vec3(0,8,-20);\r\n"+
-    
-
-    "    vec3 vPositionW = vec3(0, 10.,-20);\r\n"+
-    "    vec3 vNormalW = normalize(vec3(world * vec4(vNormal, 0.0)));\r\n"+
-    "    vec3 viewDirectionW = normalize(cameraPosition - vPositionW);\r\n"+
-
-    "    vec3 e = normalize( vec3( worldView * vPosition ) );\r\n"+
-    "    vec3 n = normalize( worldView * vec4(vNormal, 0.0) ).xyz;\r\n"+
-    "    // Light\r\n"+
-    "    vec3 lightVectorW = normalize(vPositionW);\r\n"+
-    "    vec3 color = texture2D(textureSampler, vUV).rgb;\r\n"+
-
-    "    // Specular\r\n"+
-    "    vec3 angleW = normalize(viewDirectionW + lightVectorW);\r\n"+
-    "    float specComp = max(0., dot(vNormalW, angleW));\r\n"+
-    "    specComp = pow(specComp, max(1., 64.)) * 2.;\r\n"+
-
-    "    vec3 r = reflect( e, n );\r\n"+
-    "    float m = 2. * sqrt(\r\n"+
-    "        pow( r.x, 2. ) +\r\n"+
-    "        pow( r.y, 2. ) +\r\n"+
-    "        pow( r.z + 1., 2. )\r\n"+
-    "    );\r\n"+
-    "    vec2 vN = r.xy / m + .5;\r\n"+
-
-    "    vec3 base = texture2D( refSampler, vN).rgb;\r\n"+
-
-    // "    gl_FragColor = vec4( base, 1. );\r\n"+
-    "    gl_FragColor = vec4( base + vec3(specComp), 1. );\r\n"+
-    "}\r\n";
-
-    // Compile
-    var shaderMaterial = new BABYLON.ShaderMaterial("shader", scene, {
-        vertex: "custom",
-        fragment: "custom",
-    },
-        {
-            attributes: ["position", "normal", "uv"],
-            uniforms: ["world", "worldView", "worldViewProjection", "view", "projection"]
-        });
-
-    var refTexture = new BABYLON.Texture("./assets/textures/pan.png", scene);
-    refTexture.wrapU = BABYLON.Texture.CLAMP_ADDRESSMODE;
-    refTexture.wrapV = BABYLON.Texture.CLAMP_ADDRESSMODE;
-
-    var mainTexture = new BABYLON.Texture("./assets/textures/amiga.jpg", scene);
-
-    shaderMaterial.setTexture("textureSampler", mainTexture);
-    shaderMaterial.setTexture("refSampler", refTexture);
-    shaderMaterial.setFloat("time", 0.1);
-    shaderMaterial.setVector3("cameraPosition", camera.position);
-    shaderMaterial.backFaceCulling = false;
-
-    return shaderMaterial
-}
-
-
 export {
     createCamera,
     addLight,
@@ -513,6 +382,5 @@ export {
     ImportMesh,
     particleSistem,
     solidParticleSistem,
-    addFog,
-    createShaderMaterial
+    addFog
 }

@@ -16,6 +16,7 @@ const path = {
   indexSrc: 'src/*.html',
   sassSrc: 'src/sass/**/*.scss',
   jsSrc: 'src/js/**/*.js',
+  fxSrc: 'src/*.fx',
 }
 
 
@@ -34,6 +35,13 @@ gulp.task('css', () =>
     browsers: ['last 7 versions']
   }))
   .pipe(rename('style.css'))
+  .pipe(gulp.dest('build'))
+  .pipe(browserSync.stream())
+)
+
+gulp.task('fx', () =>
+  gulp.src(path.fxSrc)
+  .pipe(plumber())
   .pipe(gulp.dest('build'))
   .pipe(browserSync.stream())
 )
@@ -88,4 +96,5 @@ gulp.task('default', ['index', 'css', 'js', 'browser-sync'], () => {
   gulp.watch(path.indexSrc, ['index'])
   gulp.watch(path.sassSrc, ['css'])
   gulp.watch(path.jsSrc, ['js'])
+  gulp.watch(path.fxSrc, ['fx'])
 })
