@@ -61,7 +61,7 @@ const particleSistem = (scene) => {
 const solidParticleSistem = (scene, material, model, camera, engine) => {
   var sps = new BABYLON.SolidParticleSystem("sps", scene);
   // var model = createRibbon(scene)
-  sps.addShape(model, 50);
+  sps.addShape(model, 350);
   sps.buildMesh();
   var particles = sps.mesh
   particles.material = material

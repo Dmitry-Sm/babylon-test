@@ -63,10 +63,10 @@ $(document).ready(()=>{
 
   let material = createShaderMaterial(scene, mainCamera, 'basic', mainTexture, refTexture)
 
-  // let boxPos = {x: 0, y: 0, z: -10}
-  // let boxSize = {width: 8, height: 8, depth: 1}
-  // let bx = createBox(scene, boxPos, boxSize)
-  // bx.material = material;
+  let boxPos = {x: 0, y: 0, z: -10}
+  let boxSize = {width: 1, height: 1, depth: 1}
+  let bx = createBox(scene, boxPos, boxSize)
+  bx.material = material;
 
 
 
@@ -106,12 +106,17 @@ $(document).ready(()=>{
   var time = 0;
 
 
+  console.log(engine);
+  console.log(scene);
 
-
+  let fpsLable = document.getElementById('fps')
 
   /////////
   ////////
   engine.runRenderLoop(function () {
+    fpsLable.innerHTML = Math.ceil(engine.getFps())
+    bx.position = new V3(scene.pointerX, scene.pointerY, 0)
+
     if (scene) {
       material.setFloat("time", time);
       sps.setParticles()

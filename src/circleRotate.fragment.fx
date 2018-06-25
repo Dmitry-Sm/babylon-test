@@ -11,6 +11,7 @@ uniform mat4 world;
 // Refs
 uniform vec3 cameraPosition;
 uniform vec3 lightPosition;
+uniform vec2 mousePosition;
 uniform sampler2D textureSampler;
 
 void main(void) {
