@@ -62,6 +62,7 @@ $(document).ready(()=>{
   var mainTexture = new BABYLON.Texture("./assets/textures/pan.png", scene);
 
   let material = createShaderMaterial(scene, mainCamera, 'basic', mainTexture, refTexture)
+  let materialPhong = createShaderMaterial(scene, mainCamera, 'phong', mainTexture, refTexture)
 
   let boxPos = {x: 0, y: 0, z: -10}
   let boxSize = {width: 1, height: 1, depth: 1}
@@ -74,7 +75,8 @@ $(document).ready(()=>{
   const onLoadSuccess = (task) => {
     let head = task.loadedMeshes[0]
     head.position = V3.Zero()
-    head.rotation.y -= 0.8
+    // head.rotation.y -= 0.8
+    head.material = materialPhong
     head.receiveShadows = true
     let size = {width: 200, height: 400, depth: 150}
 
@@ -138,9 +140,7 @@ $(document).ready(()=>{
   for (let i = 0; i < 3; i++) {
     ImportMesh(scene, '3d.babylon', onLoadSuccess, onLoadError)
   }
-
-
-
+  
 
   var slider = document.getElementById("myRange");
   var output = document.getElementById("demo");

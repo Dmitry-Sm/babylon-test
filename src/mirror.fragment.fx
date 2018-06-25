@@ -1,16 +1,18 @@
-precision highp float;
+precision mediump float;
 
 uniform mat4 worldView;
 
 varying vec4 vPosition;
 varying vec3 vNormal;
+uniform vec3 mousePosition;
 
 uniform sampler2D textureSampler;
 uniform sampler2D refSampler;
 
 void main(void) {
 
-    vec3 e = normalize( vec3( worldView * vPosition ) );
+
+    vec3 e = normalize( vec3( worldView * vPosition) );
     vec3 n = normalize( worldView * vec4(vNormal, 0.0) ).xyz;
 
     vec3 r = reflect( e, n );
