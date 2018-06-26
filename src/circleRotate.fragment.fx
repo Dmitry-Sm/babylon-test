@@ -16,6 +16,7 @@ uniform sampler2D textureSampler;
 
 void main(void) {
     vec3 vLightPosition = lightPosition;
+    vLightPosition.z = -lightPosition.z;
     
     // World values
     vec3 vPositionW = vec3(world * vec4(vPosition, 1.0));
@@ -24,14 +25,23 @@ void main(void) {
     
     // Light
     vec3 lightVectorW = normalize(vLightPosition - vPositionW);
-    vec3 color = texture2D(textureSampler, vUV).rgb;
+    vec4 color = texture2D(textureSampler, vUV);
+
     
     // diffuse
-    float ndl = max(0., dot(vNormalW, lightVectorW));
+    // float ndl = max(0., dot(vNormalW, lightVectorW));
     
     // Specular
-    vec3 angleW = normalize(viewDirectionW + lightVectorW);
-    float specComp = max(0., dot(vNormalW, angleW));
-    specComp = pow(specComp, max(1., 64.)) * 2.;
-    gl_FragColor = vec4(ndl + vec3(specComp), 1.);
+    // vec3 angleW = normalize(viewDirectionW + lightVectorW);
+    // float specComp = max(0., dot(vNormalW, angleW));
+    // specComp = pow(specComp, max(1., 4.)) * 2.;
+
+    color.a = color.a /2.;
+
+
+    // if (color.a < 0.02) {
+    //     discard;
+    // }
+
+    gl_FragColor = color;
 }

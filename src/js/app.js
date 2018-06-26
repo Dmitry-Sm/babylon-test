@@ -55,19 +55,20 @@ $(document).ready(()=>{
 
 
 
-  var refTexture = new BABYLON.Texture("./assets/textures/pan.png", scene);
+  var refTexture = new BABYLON.Texture("./assets/textures/ref.jpg", scene);
   refTexture.wrapU = BABYLON.Texture.CLAMP_ADDRESSMODE;
   refTexture.wrapV = BABYLON.Texture.CLAMP_ADDRESSMODE;
 
   var mainTexture = new BABYLON.Texture("./assets/textures/pan.png", scene);
+  let material = createShaderMaterial(scene, mainCamera, 'basic', mainTexture, refTexture, false)
 
-  let material = createShaderMaterial(scene, mainCamera, 'basic', mainTexture, refTexture)
-  let materialPhong = createShaderMaterial(scene, mainCamera, 'phong', mainTexture, refTexture)
+  mainTexture = new BABYLON.Texture("./assets/textures/pan.png", scene);
+  let materialPhong = createShaderMaterial(scene, mainCamera, 'phong', mainTexture, refTexture, false)
 
   let boxPos = {x: 0, y: 0, z: -10}
   let boxSize = {width: 1, height: 1, depth: 1}
-  let bx = createBox(scene, boxPos, boxSize)
-  bx.material = material;
+  // let bx = createBox(scene, boxPos, boxSize)
+  // bx.material = material;
 
 
 
@@ -96,13 +97,13 @@ $(document).ready(()=>{
   }
 
 
-  refTexture = new BABYLON.Texture("./assets/textures/pan.png", scene);
+  refTexture = new BABYLON.Texture("./assets/textures/flare.png", scene);
   refTexture.wrapU = BABYLON.Texture.CLAMP_ADDRESSMODE;
   refTexture.wrapV = BABYLON.Texture.CLAMP_ADDRESSMODE;
 
-  mainTexture = new BABYLON.Texture("./assets/textures/pan.png", scene);
+  mainTexture = new BABYLON.Texture("./assets/textures/line2.png", scene);
 
-  let spsMaterial = createShaderMaterial(scene, mainCamera, 'circleRotate', mainTexture, refTexture, light)
+  let spsMaterial = createShaderMaterial(scene, mainCamera, 'circleRotate', mainTexture, refTexture, true)
   let sps = solidParticleSistem(scene, spsMaterial, createRibbon(scene), mainCamera, engine)
 
   var time = 0;
@@ -117,7 +118,7 @@ $(document).ready(()=>{
   ////////
   engine.runRenderLoop(function () {
     fpsLable.innerHTML = Math.ceil(engine.getFps())
-    bx.position = new V3(scene.pointerX, scene.pointerY, 0)
+    // bx.position = new V3(scene.pointerX, scene.pointerY, 0)
 
     if (scene) {
       material.setFloat("time", time);
@@ -140,7 +141,7 @@ $(document).ready(()=>{
   for (let i = 0; i < 3; i++) {
     ImportMesh(scene, '3d.babylon', onLoadSuccess, onLoadError)
   }
-  
+
 
   var slider = document.getElementById("myRange");
   var output = document.getElementById("demo");

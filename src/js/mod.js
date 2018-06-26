@@ -178,7 +178,7 @@ const createRibbon = (scene) => {
 	var exponentialPath = function (p) {
 		var path = [];
 		for (var i = -1; i < 1; i++) {
-			path.push(new BABYLON.Vector3(i, 0, p/20));
+			path.push(new BABYLON.Vector3(i*2, 0, p/20));
 		}
 		return path;
     }

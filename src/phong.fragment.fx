@@ -1,4 +1,6 @@
+#extension GL_OES_standard_derivatives : enable
 precision mediump float;
+
 
 // Varying
 varying vec3 vPosition;
@@ -13,7 +15,7 @@ uniform vec3 cameraPosition;
 uniform sampler2D textureSampler;
 
 void main(void) {
-    vec3 vLightPosition = vec3(0,20, -20);
+    vec3 vLightPosition = vec3(0, -20, -15);
     
     // World values
     vec3 vPositionW = vec3(world * vec4(vPosition, 1.0));
@@ -23,7 +25,7 @@ void main(void) {
     // Light
     vec3 lightVectorW = normalize(vLightPosition - vPositionW);
     vec3 color = texture2D(textureSampler, vUV).rgb;
-
+    
     // diffuse
     float ndl = max(0., dot(vNormalW, lightVectorW));
     
