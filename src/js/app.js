@@ -96,7 +96,6 @@ $(document).ready(()=>{
     // bx.position = new V3(scene.pointerX, scene.pointerY, 0)
     time += 0.01
     if (scene) {
-<<<<<<< HEAD
       material.setFloat("time", time);
       materialPhong.setFloat("time", time);
       sps.setParticles()
@@ -108,10 +107,7 @@ $(document).ready(()=>{
         // heads[i].rotation.y += 0.004
         heads[i].position.x = (i - (range/100 * (heads.length - 1))) * headWidth
         heads[i].position.z = Math.abs(heads[i].position.x * 2)
-=======
-      // bx.rotation.y += Math.sin(time)/20
->>>>>>> 3605d65c88a7d528e1d3276c9a0cf76f4502579f
-
+      }
       scene.render();
     }
   })
