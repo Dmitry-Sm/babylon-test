@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 #extension GL_OES_standard_derivatives : enable
 
 #ifdef GL_ES
@@ -7,6 +8,10 @@
 precision mediump float;
 #endif
 
+=======
+precision mediump float;
+
+>>>>>>> parent of 59c878a... sh texture
 // Varying
 varying vec3 vPosition;
 varying vec3 vNormal;
@@ -72,10 +77,13 @@ float voronoi(vec2 p)
 
 void main(void) {
 <<<<<<< HEAD
+<<<<<<< HEAD
     vec2 resolution = vec2(800., 600.);
     vec3 vLightPosition = vec3(0, 20, -400);
 
 =======
+=======
+>>>>>>> parent of 59c878a... sh texture
     vec3 vLightPosition = vec3(0,20, -20);
     
 >>>>>>> parent of 59c878a... sh texture

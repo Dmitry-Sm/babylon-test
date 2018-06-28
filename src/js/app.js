@@ -86,6 +86,19 @@ $(document).ready(()=>{
     heads.push(task.loadedMeshes[0])
   }
 
+<<<<<<< HEAD
+=======
+
+
+
+
+
+  const onLoadError = (task) => {
+    console.log("error while loading " + task.name);
+  }
+
+
+>>>>>>> parent of 59c878a... sh texture
   refTexture = new BABYLON.Texture("./assets/textures/pan.png", scene);
   refTexture.wrapU = BABYLON.Texture.CLAMP_ADDRESSMODE;
   refTexture.wrapV = BABYLON.Texture.CLAMP_ADDRESSMODE;
