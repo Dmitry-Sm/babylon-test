@@ -64,49 +64,27 @@ $(document).ready(()=>{
   let material = createShaderMaterial(scene, mainCamera, 'basic', mainTexture, refTexture)
   let materialPhong = createShaderMaterial(scene, mainCamera, 'phong', mainTexture, refTexture)
 
-  let boxPos = {x: 0, y: 0, z: -10}
-  let boxSize = {width: 1, height: 1, depth: 1}
+
+  let background_material = createShaderMaterial(scene, mainCamera, 'exp')
+
+  let boxPos = {x: 0, y: 0, z: 10}
+  let boxSize = {width: 20, height: 10, depth: 1}
   let bx = createBox(scene, boxPos, boxSize)
-  bx.material = material;
-
-
-
-
-  const onLoadSuccess = (task) => {
-    let head = task.loadedMeshes[0]
-    head.position = V3.Zero()
-    // head.rotation.y -= 0.8
-    head.material = materialPhong
-    head.receiveShadows = true
-    let size = {width: 200, height: 400, depth: 150}
-
-    head.addLODLevel(150, createBox(scene, head.rotation, size))
-
-
-    heads.push(task.loadedMeshes[0])
-  }
-
-<<<<<<< HEAD
-=======
+  bx.material = background_material;
 
 
 
 
 
-  const onLoadError = (task) => {
-    console.log("error while loading " + task.name);
-  }
 
+  // refTexture = new BABYLON.Texture("./assets/textures/pan.png", scene);
+  // refTexture.wrapU = BABYLON.Texture.CLAMP_ADDRESSMODE;
+  // refTexture.wrapV = BABYLON.Texture.CLAMP_ADDRESSMODE;
 
->>>>>>> parent of 59c878a... sh texture
-  refTexture = new BABYLON.Texture("./assets/textures/pan.png", scene);
-  refTexture.wrapU = BABYLON.Texture.CLAMP_ADDRESSMODE;
-  refTexture.wrapV = BABYLON.Texture.CLAMP_ADDRESSMODE;
+  // mainTexture = new BABYLON.Texture("./assets/textures/pan.png", scene);
 
-  mainTexture = new BABYLON.Texture("./assets/textures/pan.png", scene);
-
-  let spsMaterial = createShaderMaterial(scene, mainCamera, 'circleRotate', mainTexture, refTexture, light)
-  let sps = solidParticleSistem(scene, spsMaterial, createRibbon(scene), mainCamera, engine)
+  // let spsMaterial = createShaderMaterial(scene, mainCamera, 'circleRotate', mainTexture, refTexture, light)
+  // let sps = solidParticleSistem(scene, spsMaterial, createRibbon(scene), mainCamera, engine)
 
 
 
@@ -118,29 +96,59 @@ $(document).ready(()=>{
   ////////
   engine.runRenderLoop(function () {
     fpsLable.innerHTML = Math.ceil(engine.getFps())
-    bx.position = new V3(scene.pointerX, scene.pointerY, 0)
 
     if (scene) {
-      material.setFloat("time", time);
-      materialPhong.setFloat("time", time);
-      sps.setParticles()
-      time += 0.04;
+      background_material.setFloat("time", time)
+      // material.setFloat("time", time);
+      // materialPhong.setFloat("time", time);
+      // sps.setParticles()
+      time += 0.01;
 
-      material.setVector3("cameraPosition", mainCamera.position);
+      // material.setVector3("cameraPosition", mainCamera.position);
 
       for (let i = 0; i < heads.length; i++) {
         // heads[i].rotation.y += 0.004
         heads[i].position.x = (i - (range/100 * (heads.length - 1))) * headWidth
-        heads[i].position.z = Math.abs(heads[i].position.x * 2)
+        heads[i].position.z = Math.abs(heads[i].position.x * 2) - 2.6
       }
       scene.render();
     }
   })
 
-  for (let i = 0; i < 3; i++) {
-    ImportMesh(scene, '3d.babylon', onLoadSuccess, onLoadError)
+
+
+
+
+
+  const onLoadSuccess = (task) => {
+    let head = task.loadedMeshes[0]
+    head.position = V3.Zero()
+    // head.rotation.y -= 0.8
+    head.material = materialPhong
+    head.receiveShadows = true
+    head.position.y = -6.6
+    // head.position.z = -2.2
+    let size = {width: 2, height: 1, depth: 4}
+
+
+    head.addLODLevel(80, createBox(scene, head.rotation, size))
+
+
+    heads.push(task.loadedMeshes[0])
+  }
+
+  const onLoadError = (task) => {
+    console.log("error while loading " + task.name);
+  }
+
+  for (let i = 0; i < 1; i++) {
+    ImportMesh(scene, 'head2.babylon', onLoadSuccess, onLoadError)
   }
   
+
+
+
+
 
   var slider = document.getElementById("myRange");
   var output = document.getElementById("demo");

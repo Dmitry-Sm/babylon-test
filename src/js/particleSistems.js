@@ -61,15 +61,7 @@ const particleSistem = (scene) => {
 const solidParticleSistem = (scene, material, model, camera, engine) => {
   var sps = new BABYLON.SolidParticleSystem("sps", scene);
   // var model = createRibbon(scene)
-<<<<<<< HEAD
-<<<<<<< HEAD
   sps.addShape(model, 250);
-=======
-  sps.addShape(model, 10);
->>>>>>> parent of 59c878a... sh texture
-=======
-  sps.addShape(model, 10);
->>>>>>> parent of 59c878a... sh texture
   sps.buildMesh();
   var particles = sps.mesh
   particles.material = material
@@ -80,16 +72,8 @@ const solidParticleSistem = (scene, material, model, camera, engine) => {
 
   // sps.computeParticleTexture = false
 
-<<<<<<< HEAD
-<<<<<<< HEAD
   var areaSize = 2.0
 
-=======
-  var areaSize = 2.0;
->>>>>>> parent of 59c878a... sh texture
-=======
-  var areaSize = 2.0;
->>>>>>> parent of 59c878a... sh texture
   
   var initParticle = function(particle) {
       particle.speed = Math.random()/160 + 0.005
@@ -107,15 +91,7 @@ const solidParticleSistem = (scene, material, model, camera, engine) => {
 
   var updateParticle = function(particle) {
       // particle.velocity--;
-<<<<<<< HEAD
-<<<<<<< HEAD
-      particle.rotation.x -= particle.speed
-=======
       particle.rotation.x -= 0.014;
->>>>>>> parent of 59c878a... sh texture
-=======
-      particle.rotation.x -= 0.014;
->>>>>>> parent of 59c878a... sh texture
 
       if (particle.velocity < 0) {
         particle.alive = false;

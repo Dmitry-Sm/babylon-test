@@ -9,9 +9,10 @@ const createShaderMaterial = (scene, camera, type = 'basic', mainTexture, refTex
           uniforms: ["world", "worldView", "worldViewProjection", "view", "projection"]
       });
 
-
-  shaderMaterial.setTexture("refSampler", refTexture);
-  shaderMaterial.setTexture("textureSampler", mainTexture);
+  if (refTexture)
+    shaderMaterial.setTexture("refSampler", refTexture);
+  if (mainTexture)
+    shaderMaterial.setTexture("textureSampler", mainTexture);
   if (light)
     shaderMaterial.setVector3("lightPosition", light.position);
   shaderMaterial.setFloat("time", 0.1);

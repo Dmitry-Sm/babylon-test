@@ -8,16 +8,15 @@ import {
 
 const createCamera = (scene, position) => {
     let v0 = BABYLON.Vector3.Zero()
-    let pos = new BABYLON.Vector3(0, 0, -30)
-    let radius = 30
+    let radius = 6
     // let camera = new BABYLON.FreeCamera("camera1", position, scene);
     // camera.setTarget(v0)
 
     var camera = new BABYLON.ArcRotateCamera("Camera",  -Math.PI/2, Math.PI/2, radius, v0, scene)
     // var camera = new BABYLON.ArcRotateCamera("Camera", Math.PI * 1.25, Math.PI/2, radius, v0, scene)
 
-    camera.lowerRadiusLimit = 10;
-    camera.upperRadiusLimit = 260;
+    camera.lowerRadiusLimit = 0.4;
+    camera.upperRadiusLimit = 160;
     camera.wheelDeltaPercentage = 0.05;
 
     camera.attachControl(document.getElementById("render-canvas"), false)
@@ -28,7 +27,7 @@ const createCamera = (scene, position) => {
 const addLight = (scene, position) => {
     var light = new BABYLON.PointLight("light1", position, scene);
     light.intensity = 1.2;
-    light.range = 80
+    light.range = 8
 
     return light
 }
