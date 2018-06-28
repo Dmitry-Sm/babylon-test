@@ -122,6 +122,7 @@ $(document).ready(()=>{
 
     if (scene) {
       material.setFloat("time", time);
+      materialPhong.setFloat("time", time);
       sps.setParticles()
       time += 0.04;
 

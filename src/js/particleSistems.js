@@ -61,7 +61,7 @@ const particleSistem = (scene) => {
 const solidParticleSistem = (scene, material, model, camera, engine) => {
   var sps = new BABYLON.SolidParticleSystem("sps", scene);
   // var model = createRibbon(scene)
-  sps.addShape(model, 350);
+  sps.addShape(model, 250);
   sps.buildMesh();
   var particles = sps.mesh
   particles.material = material
@@ -74,9 +74,9 @@ const solidParticleSistem = (scene, material, model, camera, engine) => {
 
   var areaSize = 2.0
 
-  let speed = Math.random()/80
   
   var initParticle = function(particle) {
+      particle.speed = Math.random()/160 + 0.005
       
       particle.position.x = 400 * areaSize * (Math.random() - 0.5);
       particle.position.y = -10;
@@ -91,7 +91,7 @@ const solidParticleSistem = (scene, material, model, camera, engine) => {
 
   var updateParticle = function(particle) {
       // particle.velocity--;
-      particle.rotation.x -= speed
+      particle.rotation.x -= particle.speed
 
       if (particle.velocity < 0) {
         particle.alive = false;
