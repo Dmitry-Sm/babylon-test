@@ -1,9 +1,11 @@
+<<<<<<< HEAD
 #extension GL_OES_standard_derivatives : enable
 
 #ifdef GL_ES
+=======
+>>>>>>> parent of 59c878a... sh texture
 precision mediump float;
 #endif
-
 
 // Varying
 varying vec3 vPosition;
@@ -69,15 +71,26 @@ float voronoi(vec2 p)
 }
 
 void main(void) {
+<<<<<<< HEAD
     vec2 resolution = vec2(800., 600.);
     vec3 vLightPosition = vec3(0, 20, -400);
 
+=======
+    vec3 vLightPosition = vec3(0,20, -20);
+    
+>>>>>>> parent of 59c878a... sh texture
     // World values
     vec3 vPositionW = vec3(world * vec4(vPosition, 1.0));
     vec3 vNormalW = normalize(vec3(world * vec4(vNormal, 0.0)));
     vec3 viewDirectionW = normalize(cameraPosition - vPositionW);
     
     vec3 lightVectorW = normalize(vLightPosition - vPositionW);
+<<<<<<< HEAD
+=======
+    vec3 color = texture2D(textureSampler, vUV).rgb;
+
+    // diffuse
+>>>>>>> parent of 59c878a... sh texture
     float ndl = max(0., dot(vNormalW, lightVectorW));
 
 

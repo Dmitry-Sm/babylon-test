@@ -19,8 +19,8 @@ varying vec2 vUV;
 void main(void) {
     vec4 outPosition = worldViewProjection * vec4(position, 1.0);
     vec3 v = position;
-    v.y = sin( atan( position.y, position.z) * 1.) * 2500. + 2475.;
-    v.z = cos( atan( position.y, position.z) * 1.) * 2500. + 200.;
+    v.y = sin( atan( position.y, position.z) * 1.) * 300. + 275.;
+    v.z = cos( atan( position.y, position.z) * 1.) * 300. + 50.;
     gl_Position = worldViewProjection * vec4(v, 1.0);
     
     vUV = uv;
