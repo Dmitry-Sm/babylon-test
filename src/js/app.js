@@ -22,6 +22,7 @@ import {
 } from './materials'
 
 import{initEngine} from './initEngine'
+import { Vector2, float } from 'babylonjs';
  
 
 
@@ -61,19 +62,26 @@ $(document).ready(()=>{
 
   var mainTexture = new BABYLON.Texture("./assets/textures/pan.png", scene);
 
-  let material = createShaderMaterial(scene, mainCamera, 'basic', mainTexture, refTexture)
+  // let material = createShaderMaterial(scene, mainCamera, 'basic', mainTexture, refTexture)
   let materialPhong = createShaderMaterial(scene, mainCamera, 'phong', mainTexture, refTexture)
 
 
-  let background_material = createShaderMaterial(scene, mainCamera, 'exp')
+  let background_material = createShaderMaterial(scene, mainCamera, 'exp2')
 
-  let boxPos = {x: 0, y: 0, z: 10}
-  let boxSize = {width: 20, height: 10, depth: 1}
+  background_material.setFloat("width", 500)
+  background_material.setFloat("height", 500)
+  background_material.setVector2("resolution", new BABYLON.Vector2(engine._gl.drawingBufferWidth, engine._gl.drawingBufferHeight))
+
+
+
+  let boxPos = {x: 0, y: 0, z: 100}
+  let boxSize = {width: 2000, height: 200, depth: 1}
   let bx = createBox(scene, boxPos, boxSize)
   bx.material = background_material;
 
 
-
+  // console.log(engine);
+  
 
 
 
@@ -97,12 +105,13 @@ $(document).ready(()=>{
   engine.runRenderLoop(function () {
     fpsLable.innerHTML = Math.ceil(engine.getFps())
 
+
     if (scene) {
       background_material.setFloat("time", time)
       // material.setFloat("time", time);
       // materialPhong.setFloat("time", time);
       // sps.setParticles()
-      time += 0.01;
+      time += 0.001;
 
       // material.setVector3("cameraPosition", mainCamera.position);
 
@@ -117,6 +126,7 @@ $(document).ready(()=>{
 
 
 
+  
 
 
 
@@ -131,7 +141,7 @@ $(document).ready(()=>{
     let size = {width: 2, height: 1, depth: 4}
 
 
-    head.addLODLevel(80, createBox(scene, head.rotation, size))
+    head.addLODLevel(100, createBox(scene, head.rotation, size))
 
 
     heads.push(task.loadedMeshes[0])
@@ -159,4 +169,16 @@ $(document).ready(()=>{
       output.innerHTML = Math.ceil(this.value/100 * (heads.length - 1) * 10) / 10 + 1
       range = this.value
   }
+
+
+  window.addEventListener("resize", function () {
+    engine.resize()
+    background_material.setVector2("resolution", new BABYLON.Vector2(engine._gl.drawingBufferWidth, engine._gl.drawingBufferHeight))
+    materialPhong.setFloat("width", 500)
+    materialPhong.setFloat("height", 500)
+
+  })
+
+
+  
 })

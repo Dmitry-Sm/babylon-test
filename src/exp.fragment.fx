@@ -8,6 +8,10 @@ varying vec2 vUV;
 uniform float time;
 // Uniforms
 uniform mat4 world;
+uniform vec2 resolution;
+uniform float width;
+uniform float height;
+
 
 // Refs
 uniform vec3 cameraPosition;
@@ -27,7 +31,7 @@ mat2 rotate(float a) {
 
 void main(void) {
     vec3 vLightPosition = vec3(0,20, -10);
-    vec2 resolution = vec2(500, 500);
+    // vec2 resolution = vec2(width, height);
     
     // World values
     vec3 vPositionW = vec3(world * vec4(vPosition, 1.0));
@@ -48,19 +52,19 @@ void main(void) {
     
     vec2 uv = rotate(time / 5.) *
       ((2. * gl_FragCoord.xy - resolution.xy) 
-      / resolution.y);
+      / resolution.y / 2.);
     
     float l = length(uv);
     
     float inv = 1. / l;
     vec2 uvp = mod(
-      uv * inv - vec2(inv * 3. + time / 2., 0.) + 1.,
+      uv * inv - vec2(inv * 2. + sin(time) / 2., 0.) + 1.,
       vec2(2.)) - 1.;
 
     vec3 image = vec3(
       pattern(uvp * 2.) * l / 2.,
-      0.,
-      pattern(uvp * 10.) * l / 2.);
+      pattern(uvp * 2.) * l / 2.,
+      pattern(uvp * 2.) * l / 2.);
           
     
 

@@ -8,9 +8,7 @@ const initEngine = () => {
   var scene = new Scene(engine);   
   scene.clearColor = new BABYLON.Color3(0, 0, 0);
 
-  window.addEventListener("resize", function () {
-    engine.resize();
-  });
+
 
   return [engine, scene]
 }
